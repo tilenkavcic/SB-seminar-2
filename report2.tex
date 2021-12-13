@@ -1,0 +1,504 @@
+% https://medium.com/softway-blog/building-a-facial-recognition-machine-learning-model-using-tensorflow-6e62fb349794
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% datoteka diploma-vzorec.tex
+%
+% vzorčna datoteka za pisanje diplomskega dela v formatu LaTeX
+% na UL Fakulteti za računalništvo in informatiko
+%
+% vkup spravil Gašper Fijavž, december 2010
+% 
+%
+%
+% verzija 12. februar 2014 (besedilo teme, seznam kratic, popravki Gašper Fijavž)
+% verzija 10. marec 2014 (redakcijski popravki Zoran Bosnić)
+% verzija 11. marec 2014 (redakcijski popravki Gašper Fijavž)
+% verzija 15. april 2014 (pdf/a 1b compliance, not really - just claiming, Damjan Cvetan, Gašper Fijavž)
+% verzija 23. april 2014 (privzeto cc licenca)
+% verzija 16. september 2014 (odmiki strain od roba)
+% verzija 28. oktober 2014 (odstranil vpisno številko)
+% verija 5. februar 2015 (Literatura v kazalu, online literatura)
+% verzija 25. september 2015 (angl. naslov v izjavi o avtorstvu)
+% verzija 26. februar 2016 (UL izjava o avtorstvu)
+% verzija 16. april 2016 (odstranjena izjava o avtorstvu)
+% verzija 5. junij 2016 (Franc Solina dodal vrstice, ki jih je označil s svojim imenom)
+
+
+\documentclass[a4paper, 12pt]{book}
+%\documentclass[a4paper, 12pt, draft]{book}  Nalogo preverite tudi z opcijo draft, ki vam bo pokazala, katere vrstice so predolge!
+
+\usepackage[utf8x]{inputenc}   % omogoča uporabo slovenskih črk kodiranih v formatu UTF-8
+\usepackage[slovene,english]{babel}    % naloži, med drugim, slovenske delilne vzorce
+\usepackage[pdftex]{graphicx}  % omogoča vlaganje slik različnih formatov
+\usepackage{fancyhdr}          % poskrbi, na primer, za glave strani
+\usepackage{amssymb}           % dodatni simboli
+\usepackage{amsmath}           % eqref, npr.
+%\usepackage{hyperxmp}
+\usepackage[hyphens]{url}  % dodal Solina
+\usepackage{comment}       % dodal Solina
+
+\usepackage[pdftex, colorlinks=true,
+						citecolor=black, filecolor=black, 
+						linkcolor=black, urlcolor=black,
+						pagebackref=false, 
+						pdfproducer={LaTeX}, pdfcreator={LaTeX}, hidelinks]{hyperref}
+
+\usepackage{color}       % dodal Solina
+\usepackage{soul}       % dodal Solina
+\usepackage[numbers]{natbib}  % dodal Solina
+\usepackage{listings}
+\usepackage[toc,page]{appendix}
+\renewcommand{\appendixpagename}{Priloge}
+\renewcommand{\appendixtocname}{Priloge}
+\renewcommand{\appendixname}{Priloge}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	DIPLOMA INFO
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\ttitle}{Assignment \#2}
+% \newcommand{\ttitleEn}{Image Based Biometry Assignment \#2}
+\newcommand{\tsubject}{\ttitle}
+% \newcommand{\tsubjectEn}{\ttitleEn}
+\newcommand{\tauthor}{Tilen Kavčič}
+% \newcommand{\tkeywords}{računalnik, računalnik, računalnik}
+% \newcommand{\tkeywordsEn}{computer, computer, computer}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	HYPERREF SETUP
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\hypersetup{pdftitle={\ttitle}}
+% \hypersetup{pdfsubject=\ttitleEn}
+\hypersetup{pdfauthor={\tauthor}}
+% \hypersetup{pdfkeywords=\tkeywordsEn}
+
+
+ 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% postavitev strani
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+
+\addtolength{\marginparwidth}{-20pt} % robovi za tisk
+\addtolength{\oddsidemargin}{40pt}
+\addtolength{\evensidemargin}{-40pt}
+
+\renewcommand{\baselinestretch}{1.3} % ustrezen razmik med vrsticami
+\setlength{\headheight}{15pt}        % potreben prostor na vrhu
+\renewcommand{\chaptermark}[1]%
+{\markboth{\MakeUppercase{\thechapter.\ #1}}{}} \renewcommand{\sectionmark}[1]%
+{\markright{\MakeUppercase{\thesection.\ #1}}} \renewcommand{\headrulewidth}{0.5pt} \renewcommand{\footrulewidth}{0pt}
+\fancyhf{}
+\fancyhead[LE,RO]{\sl \thepage} 
+%\fancyhead[LO]{\sl \rightmark} \fancyhead[RE]{\sl \leftmark}
+\fancyhead[RE]{\sc \tauthor}              % dodal Solina
+\fancyhead[LO]{\sc Diplomska naloga}     % dodal Solina
+
+
+\newcommand{\BibTeX}{{\sc Bib}\TeX}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% naslovi
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+
+
+\newcommand{\autfont}{\Large}
+\newcommand{\titfont}{\LARGE\bf}
+\newcommand{\clearemptydoublepage}{\newpage{\pagestyle{empty}\cleardoublepage}}
+\setcounter{tocdepth}{1}	      % globina kazala
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% konstrukti
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+\newtheorem{izrek}{Izrek}[chapter]
+\newtheorem{trditev}{Trditev}[izrek]
+\newenvironment{dokaz}{\emph{Dokaz.}\ }{\hspace{\fill}{$\Box$}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% PDF-A
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% define medatata
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\def\Title{\ttitle}
+\def\Author{\tauthor, matjaz.kralj@fri.uni-lj.si}
+\def\Subject{\ttitleEn}
+\def\Keywords{\tkeywordsEn}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% \convertDate converts D:20080419103507+02'00' to 2008-04-19T10:35:07+02:00
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\def\convertDate{%
+    \getYear
+}
+
+{\catcode`\D=12
+ \gdef\getYear D:#1#2#3#4{\edef\xYear{#1#2#3#4}\getMonth}
+}
+\def\getMonth#1#2{\edef\xMonth{#1#2}\getDay}
+\def\getDay#1#2{\edef\xDay{#1#2}\getHour}
+\def\getHour#1#2{\edef\xHour{#1#2}\getMin}
+\def\getMin#1#2{\edef\xMin{#1#2}\getSec}
+\def\getSec#1#2{\edef\xSec{#1#2}\getTZh}
+\def\getTZh +#1#2{\edef\xTZh{#1#2}\getTZm}
+\def\getTZm '#1#2'{%
+    \edef\xTZm{#1#2}%
+    \edef\convDate{\xYear-\xMonth-\xDay T\xHour:\xMin:\xSec+\xTZh:\xTZm}%
+}
+
+\expandafter\convertDate\pdfcreationdate 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% get pdftex version string
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\newcount\countA
+\countA=\pdftexversion
+\advance \countA by -100
+\def\pdftexVersionStr{pdfTeX-1.\the\countA.\pdftexrevision}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% XMP data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+\usepackage{xmpincl}
+% \includexmp{pdfa-1b}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% pdfInfo
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+\pdfinfo{%
+    /Title    (\ttitle)
+    /Author   (\tauthor)
+    % /Subject  (\ttitleEn)
+    % /Keywords (\tkeywordsEn)
+    /ModDate  (\pdfcreationdate)
+    /Trapped  /False
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\selectlanguage{slovene}
+\frontmatter
+\setcounter{page}{1} %
+\renewcommand{\thepage}{}       % preprecimo težave s številkami strani v kazalu
+\newcommand{\sn}[1]{"`#1"'}                    % dodal Solina (slovenski narekovaji)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%naslovnica
+\thispagestyle{empty}%
+\begin{center}
+    {\large\sc Univerza v Ljubljani\\%
+        %      Fakulteta za elektrotehniko\\% za študijski program Multimedija
+        %      Fakulteta za upravo\\% za študijski program Upravna informatika
+        Fakulteta za računalništvo in informatiko\\%
+        %      Fakulteta za matematiko in fiziko\\% za študijski program Računalništvo in matematika
+    }
+    \vskip 10em%
+        {\autfont \tauthor\par}%
+        {\titfont \ttitle \par}%
+        {\vskip 3em \textsc{IMAGE BASED BIOMERY\\[5mm]}}         % dodal Solina za ostale študijske programe
+    %    VISOKOŠOLSKI STROKOVNI ŠTUDIJSKI PROGRAM\\ PRVE STOPNJE\\ RAČUNALNIŠTVO IN INFORMATIKA}\par}%
+    %  UNIVERZITETNI  ŠTUDIJSKI PROGRAM\\ PRVE STOPNJE\\ RAČUNALNIŠTVO IN INFORMATIKA}\par}%
+    %    INTERDISCIPLINARNI UNIVERZITETNI\\ ŠTUDIJSKI PROGRAM PRVE STOPNJE\\ MULTIMEDIJA}\par}%
+    %    INTERDISCIPLINARNI UNIVERZITETNI\\ ŠTUDIJSKI PROGRAM PRVE STOPNJE\\ UPRAVNA INFORMATIKA}\par}%
+    %    INTERDISCIPLINARNI UNIVERZITETNI\\ ŠTUDIJSKI PROGRAM PRVE STOPNJE\\ RAČUNALNIŠTVO IN MATEMATIKA}\par}%
+    \vfill\null%
+    % izberite pravi habilitacijski naziv mentorja!
+    %     {\large \textsc{Mentor}: viš. pred./doc./izr. prof./prof. dr. Peter Klepec\par}%
+    %    {\large \textsc{Somentor}:  viš. pred./doc./izr. prof./prof. dr.  Martin Krpan \par}%
+    {\vskip 2em \large Ljubljana, 2021 \par}%
+\end{center}
+% prazna stran
+%\clearemptydoublepage      % dodal Solina (izjava o licencah itd. se izpiše na hrbtni strani naslovnice)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%copyright stran
+% \thispagestyle{empty}
+% \vspace*{8cm}
+
+% \noindent
+% {\sc Copyright}. 
+% Rezultati diplomske naloge so intelektualna lastnina avtorja in matične fakultete Univerze v Ljubljani.
+% Za objavo in koriščenje rezultatov diplomske naloge je potrebno pisno privoljenje avtorja, fakultete ter mentorja.
+
+% \begin{center}
+% \mbox{}\vfill
+% \emph{Besedilo je oblikovano z urejevalnikom besedil \LaTeX.}
+% \end{center}
+% % prazna stran
+% \clearemptydoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% stran 3 med uvodnimi listi
+% \thispagestyle{empty}
+% \
+% \vfill
+
+% \bigskip
+% \noindent\textbf{Kandidat:} Ime Priimek\\
+% \noindent\textbf{Naslov:} Naslov diplome v slovenščini\\
+% % vstavite ustrezen naziv študijskega programa!
+% \noindent\textbf{Vrsta naloge:} npr. Diplomska naloga na univerzitetnem programu prve stopnje Računalništvo in informatika \\
+% % izberite pravi habilitacijski naziv mentorja!
+% \noindent\textbf{Mentor:} viš. pred. / doc. / izr. prof. / prof. dr. Ime Priimek\\
+% \noindent\textbf{Somentor:} isto kot za mentorja
+
+% \bigskip
+% \noindent\textbf{Opis:}\\
+% Besedilo teme diplomskega dela študent prepiše iz študijskega informacijskega sistema, kamor ga je vnesel mentor. 
+% V nekaj stavkih bo opisal, kaj pričakuje od kandidatovega diplomskega dela. 
+% Kaj so cilji, kakšne metode naj uporabi, morda bo zapisal tudi ključno literaturo.
+
+% \bigskip
+% \noindent\textbf{Title:} Naslov diplome v angleščini
+
+% \bigskip
+% \noindent\textbf{Description:}\\
+% opis diplome v angleščini
+
+% \vfill
+
+
+
+% \vspace{2cm}
+
+% prazna stran
+% \clearemptydoublepage
+
+% zahvala
+% \thispagestyle{empty}\mbox{}\vfill\null\it%
+% \noindent
+% Na tem mestu zapišite, komu se zahvaljujete za izdelavo diplomske naloge. Pazite, da ne boste koga pozabili. Utegnil vam bo zameriti. Temu se da izogniti tako, da celotno zahvalo izpustite.
+% \rm\normalfont
+
+% prazna stran
+% \clearemptydoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% posvetilo, če sama zahvala ne zadošča :-)
+% \thispagestyle{empty}\mbox{}{\vskip0.20\textheight}\mbox{}\hfill\begin{minipage}{0.55\textwidth}%
+% Svoji dragi Alenčici.
+% \normalfont\end{minipage}
+
+% prazna stran
+% \clearemptydoublepage
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% kazalo
+% \pagestyle{empty}
+% \def\thepage{}% preprecimo tezave s stevilkami strani v kazalu
+% \tableofcontents{}
+
+
+% prazna stran
+% \clearemptydoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% seznam kratic
+
+% \chapter*{Seznam uporabljenih kratic}  % spremenil Solina, da predolge vrstice ne gredo preko desnega roba
+
+% \begin{comment}
+% \begin{tabular}{l|l|l}
+%   {\bf kratica} & {\bf angleško} & {\bf slovensko} \\ \hline
+%   % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+%   {\bf CA} & classification accuracy & klasifikacijska točnost \\
+%   {\bf DBMS} & database management system & sistem za upravljanje podatkovnih baz \\
+%   {\bf SVM} & support vector machine & metoda podpornih vektorjev \\
+%   \dots & \dots & \dots \\
+% \end{tabular}
+% \end{comment}
+
+% \noindent\begin{tabular}{p{0.1\textwidth}|p{.4\textwidth}|p{.4\textwidth}}    % po potrebi razširi prvo kolono tabele na račun drugih dveh!
+%   {\bf kratica} & {\bf angleško}                             & {\bf slovensko} \\ \hline
+%   {\bf CA}      & classification accuracy               & klasifikacijska točnost \\
+%   {\bf DBMS} & database management system & sistem za upravljanje podatkovnih baz \\
+%   {\bf SVM}   & support vector machine              & metoda podpornih vektorjev \\
+% %  \dots & \dots & \dots \\
+% \end{tabular}
+
+
+% prazna stran
+% \clearemptydoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% povzetek
+% \addcontentsline{toc}{chapter}{Povzetek}
+% \chapter*{Povzetek}
+
+% \noindent\textbf{Naslov:} \ttitle
+% \bigskip
+
+% \noindent\textbf{Avtor:} \tauthor
+% \bigskip
+
+% %\noindent\textbf{Povzetek:} 
+% \noindent V vzorcu je predstavljen postopek priprave diplomskega dela z uporabo okolja \LaTeX. Vaš povzetek mora sicer vsebovati približno 100 besed, ta tukaj je odločno prekratek.
+% Dober povzetek vključuje: (1) kratek opis obravnavanega problema, (2) kratek opis vašega pristopa za reševanje tega problema in (3) (najbolj uspešen) rezultat ali prispevek magistrske naloge.
+
+% \bigskip
+
+% \noindent\textbf{Ključne besede:} \tkeywords.
+% prazna stran
+% \clearemptydoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% abstract
+% \selectlanguage{english}
+% \addcontentsline{toc}{chapter}{Abstract}
+% \chapter*{Abstract}
+
+% % \noindent\textbf{Title:} \ttitleEn
+% \bigskip
+
+% \noindent\textbf{Author:} \tauthor
+% \bigskip
+
+%\noindent\textbf{Abstract:} 
+% \noindent This sample document presents an approach to typesetting your BSc thesis using \LaTeX.
+% A proper abstract should contain around 100 words which makes this one way too short.
+% \bigskip
+
+% \noindent\textbf{Keywords:} \tkeywordsEn.
+% \selectlanguage{slovene}
+% prazna stran
+% \clearemptydoublepages
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\mainmatter
+\setcounter{page}{1}
+\pagestyle{fancy}
+
+\chapter{Introduction}
+We look at face recognition on WIDER FACE database using convolutional neural networks (CNNs).
+
+\chapter{Process}
+
+\section{Data acquisition}
+We selected the WIDER FACE dataset and extracted the images and annotations.
+For easier training and validation we picked out a subset of the images. More specifically we selected 996 training images from the demonstration category and 248 validation images from the same category.
+
+\section{Preprocessing}
+For speed we tryed to minimize the resolution of the images without hampering training. Image size, for this reason, was set to minimum 224x224.
+We use `ImageDataGenerator` to rescale the images.
+We seperate the images into training and validation sets. The code is shown in appendix \ref{appendix:Preprocessing}.
+
+\section{The model}
+We created a base model from the pre-trained CNN model MobileNet V2. This model was created from the training data commpiled in previous steps.
+The model was developed at Google and was pre-trained on the ImageNet dataset, a large dataset of 1.4M images and 1000 classes of web images.
+
+Out base model is a 2D Convolution network (32 nodes, 3 Kernel size, Activation Function). We set the probability of each non-contributing node being dropped to 20\%. We use the Softmax activation function. We set Epochs to 10 (model trained in 10 iterations). The code is shown in appendix \ref{appendix:model}.
+
+\section{Evaluation}
+We visualise the learing curves of the model. They are shown below \ref{res}. The accuracy of the model after 10 epochs is 0.802. The code is shown in appendix \ref{appendix:Visualisation}.
+
+\begin{figure}[ht]
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{images/download (1).png}
+    \end{center}
+    \caption{Training and valuation accuracy.}
+    \label{res}
+\end{figure}
+
+
+
+
+% \cleardoublepage
+% \addcontentsline{toc}{chapter}{Literatura}
+% \bibliography{literatura}
+% \bibliographystyle{plainnat}
+
+\begin{appendices}
+
+\chapter{Programska koda}
+\section{Preprocessing}
+\label{appendix:Preprocessing}
+\begin{lstlisting}
+IMAGE_SIZE = 224
+BATCH_SIZE = 5
+
+# rescales the images
+data_generator = tf.keras.preprocessing.image.
+    ImageDataGenerator(
+        rescale=1. / 255,
+        validation_split=0.2)
+
+train_generator = data_generator.flow_from_directory(
+    base_dir,
+    target_size=(IMAGE_SIZE, IMAGE_SIZE),
+    batch_size=BATCH_SIZE,
+    subset='training')
+
+val_generator = data_generator.flow_from_directory(
+    base_dir,
+    target_size=(IMAGE_SIZE, IMAGE_SIZE),
+    batch_size=BATCH_SIZE,
+    subset='validation')
+
+for image_batch, label_batch in train_generator:
+    break
+
+print(train_generator.class_indices)
+
+labels = '\n'.join(sorted(
+    train_generator.class_indices.keys())
+)
+
+with open('labels.txt', 'w') as f:
+    f.write(labels)
+\end{lstlisting}
+
+\section{The model}
+\label{appendix:model}
+\begin{lstlisting}
+IMG_SHAPE = (IMAGE_SIZE, IMAGE_SIZE, 3)
+base_model = tf.keras.applications.
+                MobileNetV2(input_shape=IMG_SHAPE,
+                            include_top=False,
+                            weights='imagenet')
+base_model.trainable = False
+model = tf.keras.Sequential([
+    base_model, 
+    tf.keras.layers.Conv2D(32, 3, activation='relu'),  
+    tf.keras.layers.Dropout(0.2),  
+    tf.keras.layers.GlobalAveragePooling2D(),  
+    tf.keras.layers.Dense(3, activation='softmax')  
+])
+model.compile(optimizer=tf.keras.optimizers.Adam(),  
+              loss='categorical_crossentropy', 
+              metrics=['accuracy'])  
+model.summary()
+print('Number of trainable variables = {}'.
+        format(len(model.trainable_variables)))
+epochs = 10
+history = model.fit(train_generator,
+                    epochs=epochs,
+                    validation_data=val_generator)
+\end{lstlisting}
+
+\section{Visualisation}
+\label{appendix:Visualisation}
+\begin{lstlisting}
+acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
+
+plt.figure(figsize=(8, 8))
+plt.subplot(2, 1, 1)
+plt.plot(acc, label='Training Accuracy')
+plt.plot(val_acc, label='Validation Accuracy')
+plt.legend(loc='lower right')
+plt.ylabel('Accuracy')
+plt.ylim([min(plt.ylim()), 1])
+plt.title('Training and Validation Accuracy')
+print(val_acc)
+\end{lstlisting}
+
+\end{appendices}
+
+\end{document}
